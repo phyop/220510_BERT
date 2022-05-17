@@ -582,6 +582,8 @@ def file_based_convert_examples_to_features(
       f = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
       return f
 
+    # 建立一個OrderedDict()物件，來把各種feature裝進去
+    # 因爲OrderedDict()是一個可以裝東西進去的物件，所以被放在collections類裏面
     features = collections.OrderedDict()
     features["input_ids"] = create_int_feature(feature.input_ids)
     features["input_mask"] = create_int_feature(feature.input_mask)
@@ -590,6 +592,10 @@ def file_based_convert_examples_to_features(
     features["is_real_example"] = create_int_feature(
         [int(feature.is_real_example)])
 
+    # 最後面()的第1個feature是Features的參數，第2個feature是引數（也就是轉換完的結果）
+    # 把各種feature用OrderedDict()打包起來，然後傳給Example()，再去使用tf.string做成序列化來儲存
+    # Feature()就是一個單純的dict()
+    # Example()是多了一層dict()的複合型字典
     tf_example = tf.train.Example(features=tf.train.Features(feature=features))
     writer.write(tf_example.SerializeToString())
   writer.close()
